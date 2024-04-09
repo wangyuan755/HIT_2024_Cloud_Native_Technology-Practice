@@ -1,0 +1,10 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: eureka-server
+  profiles:
+    active: dev
+  cloud:
+    inetutils:
+      ignored-interfaces: 'VMware Virtual Ethernet Adapter for VMnet1,VMware Virtual Ethernet Adapter for VMnet8'

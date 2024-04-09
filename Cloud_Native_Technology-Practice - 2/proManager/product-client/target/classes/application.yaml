@@ -1,0 +1,14 @@
+server:
+  port: 8018
+spring:
+  application:
+    name: product-client
+  profiles:
+    active: dev
+  cloud:
+    inetutils:
+      ignored-interfaces: 'VMware Virtual Ethernet Adapter for VMnet1,VMware Virtual Ethernet Adapter for VMnet8'
+ribbon:
+  eureka:
+    enabled:
+      true
