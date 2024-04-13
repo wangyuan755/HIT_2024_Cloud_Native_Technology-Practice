@@ -1,7 +1,7 @@
 eureka:
   instance:
     hostname:
-      peer1
+      127.0.0.1
     prefer-ip-address:
       false
   client:

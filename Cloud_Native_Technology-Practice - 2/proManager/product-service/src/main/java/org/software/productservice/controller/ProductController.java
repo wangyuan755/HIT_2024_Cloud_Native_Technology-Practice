@@ -20,7 +20,7 @@ public class ProductController {
      * 根据商品 id 查询商品
      */
     @GetMapping("/findByProductId/{productId}")
-    public Product findByProductId(@PathVariable Long productId) {
+    public Product findByProductId(@PathVariable(value = "productId") Long productId) {
         Product product = productMapper.findByProductId(productId);
         log.info("-------------OK /findByProductId/{productId}--------------------");
         return product;

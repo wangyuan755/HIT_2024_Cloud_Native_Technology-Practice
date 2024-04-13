@@ -8,7 +8,14 @@ spring:
   cloud:
     inetutils:
       ignored-interfaces: 'VMware Virtual Ethernet Adapter for VMnet1,VMware Virtual Ethernet Adapter for VMnet8'
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+
+
 ribbon:
   eureka:
     enabled:
       true
+

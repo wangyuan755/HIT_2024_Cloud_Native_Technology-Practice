@@ -2,13 +2,16 @@ package org.software.productclient.client;
 
 import org.software.productclient.model.Product;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 /**
  * 商品服务远程调用客户端
  */
-@FeignClient(name="product-service")
+
+@Primary
+@FeignClient(name="product-service",fallback = ProductServiceFallback.class)
 public interface ProductServiceClient {
     /**
      * 根据商品 id 获取商品对象

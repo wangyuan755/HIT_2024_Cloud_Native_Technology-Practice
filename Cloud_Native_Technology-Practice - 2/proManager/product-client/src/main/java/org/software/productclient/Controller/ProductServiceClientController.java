@@ -5,8 +5,10 @@ import org.software.productclient.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -30,8 +32,9 @@ public class ProductServiceClientController {
      * 查询所有商品
      */
     @GetMapping("/queryAllProduct")
-    public List<Product> findByProductId() {
+    public List<Product> findByProductId() throws InterruptedException {
         List<Product> productList = prodServiceClient.queryAllProduct();
+        Thread.sleep(2000);
         log.info("--------------In client queryAllProduct--------------");
         return productList;
     }
