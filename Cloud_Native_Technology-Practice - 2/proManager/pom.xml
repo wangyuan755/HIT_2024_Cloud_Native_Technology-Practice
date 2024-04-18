@@ -12,7 +12,7 @@
         <module>eureka-service</module>
         <module>product-service</module>
         <module>product-client</module>
-        <module>gateway-service</module>
+        <module>gateways-service</module>
     </modules>
     <name>microservice-demo</name>
     <packaging>pom</packaging>

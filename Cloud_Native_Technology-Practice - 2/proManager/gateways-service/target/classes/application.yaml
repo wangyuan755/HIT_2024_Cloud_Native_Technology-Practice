@@ -1,0 +1,20 @@
+server:
+  port: 9999
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateways-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+      - id: product-client
+        uri: lb://product-client
+        filters:
+        - StripPrefix=1
+        predicates:
+        - Path=/product/**
