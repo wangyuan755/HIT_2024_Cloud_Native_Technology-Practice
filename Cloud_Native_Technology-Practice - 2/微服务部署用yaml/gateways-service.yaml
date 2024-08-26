@@ -1,0 +1,38 @@
+kind: List
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: gateways-service
+    namespace: wangyuan755
+  spec:
+    type: NodePort
+    selector:
+      app: gateways-service
+    ports:
+    - name: http
+      port: 9999
+      targetPort: 9999
+      nodePort: 30099
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: gateways-service
+    namespace: wangyuan755
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: gateways-service
+    template:
+      metadata:
+        labels:
+          app: gateways-service
+      spec:
+        containers:
+        - name: gateways-service
+          imagePullPolicy: IfNotPresent
+          image: registry.cn-hangzhou.aliyuncs.com/wangyuan755/gateways-service
+          ports:
+          - containerPort: 9999

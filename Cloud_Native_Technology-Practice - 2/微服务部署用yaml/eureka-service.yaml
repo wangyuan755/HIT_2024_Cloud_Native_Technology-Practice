@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: eureka-service
+      namespace: wangyuan755
+    spec:
+      type: NodePort
+      ports:
+        - port: 8888
+          targetPort: 8888
+          nodePort: 30001
+      selector:
+        app: eureka
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: eureka-deployment
+      namespace: wangyuan755
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: eureka
+      template:
+        metadata:
+          labels:
+            app: eureka
+        spec:
+          containers:
+            - name: eureka
+              imagePullPolicy: IfNotPresent
+              image: registry.cn-hangzhou.aliyuncs.com/wangyuan755/eureka-service:latest
+              ports:
+                - containerPort: 8888

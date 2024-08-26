@@ -1,0 +1,88 @@
+pipeline{
+    agent any
+    parameters {
+        booleanParam(name: 'Checkout', defaultValue: true, description: '拉取代码')
+        booleanParam(name: 'Build', defaultValue: true, description: '生成 jar')
+        booleanParam(name: 'BuildImages', defaultValue: true, description: '生成镜像')
+        booleanParam(name: 'Pushimage', defaultValue: true, description: '推送镜像')
+        booleanParam(name: 'Deploy', defaultValue: true, description: '部署服务')
+    }
+    environment {
+        docker_registry = 'registry.cn-hangzhou.aliyuncs.com'
+        service_list = 'eureka-service gateways-service product-service product-client'
+        //version = "${env.BUILD_NUMBER}"
+        //如果每次根据版本生成镜像，则将下面的去掉，用上面那个
+         version = "latest"
+    }
+    stages{
+        stage('Checkout'){
+            when {
+                expression { params.Checkout == true }
+            }
+            steps{
+                git credentialsId: 'gitee', url: 'https://gitee.com/wangyuan755/cloud-native2.git'
+            }
+        }
+        stage('Build'){
+            when {
+                expression { params.Build == true }
+            }
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('BuildImages') {
+            when {
+                expression { params.BuildImages == true }
+            }
+            steps {
+                script {
+                    def work_dir = pwd()
+                    for (service in service_list.split()) {
+                        dir("$work_dir/$service") {
+                        def image_name = "${docker_registry}/wangyuan755/${service}:${version}"
+                        echo "${image_name}"
+                        sh "docker build -f Dockerfile -t ${image_name} ."
+                        }
+                    }
+                
+                }
+            }
+        }
+        stage("Pushimage"){
+            when {
+                expression { params.Pushimage == true }
+            }
+            steps{
+                    withCredentials([usernamePassword(credentialsId: 'aliyun', passwordVariable: 'ALIYUN_PASSWORD', usernameVariable:'ALIYUN_USERNAME')])
+                    {
+                        sh "docker login --username=$ALIYUN_USERNAME --password=$ALIYUN_PASSWORD registry.cn-hangzhou.aliyuncs.com"
+                        sh "docker push registry.cn-hangzhou.aliyuncs.com/wangyuan755/gateways-service:${version}"
+                        sh "docker push registry.cn-hangzhou.aliyuncs.com/wangyuan755/eureka-service:${version}"
+                        sh "docker push registry.cn-hangzhou.aliyuncs.com/wangyuan755/product-service:${version}"
+                        sh "docker push registry.cn-hangzhou.aliyuncs.com/wangyuan755/product-client:${version}"
+                    }
+                }
+        }
+        stage("Deploy"){
+            when {
+                expression { params.Deploy == true }
+            }
+            steps{
+                script{
+                    withCredentials([certificate(aliasVariable: '', credentialsId: 'k8s2', keystoreVariable: 'CERTIFICATE_KEYSTORE', passwordVariable:'CERTIFICATE_PASSWORD')]) {
+                        def work_dir = pwd()
+                        sh 'echo $work_dir'
+                        dir("$work_dir/k8s"){
+                        sh 'ls'
+                        sh 'kubectl apply -f gateways-service.yaml'
+                        sh 'kubectl apply -f eureka-service.yaml'
+                        sh 'kubectl apply -f product-service.yaml'
+                        sh 'kubectl apply -f product-client.yaml'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
